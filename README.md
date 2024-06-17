@@ -14,17 +14,14 @@ RootDirectory/
     └── File4.txt
 ```
 
-
 ```
-New folder/
+Newfolder/
 ├── age/
-│   └── New Text Document.txt
+│   └── NewTextDocument.txt
 └── name/
     └── meo/
         ├── lenth.txt
         └── xinto.txt
-
-
 ```
 
 

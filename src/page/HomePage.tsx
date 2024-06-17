@@ -1,6 +1,7 @@
-import {Button, Group, Paper, Stack, Text, TextInput} from "@mantine/core";
+import {Button, Group, Paper, Stack, TextInput} from "@mantine/core";
 import {useRef, useState} from "react";
 import {invoke} from "@tauri-apps/api";
+import Markdown from "react-markdown";
 
 export default function HomePage() {
     const [result, setResult] = useState('');
@@ -9,7 +10,7 @@ export default function HomePage() {
     async function handleClickRender() {
         console.log(input.current?.value)
         const folderStructure = await invoke('get_folder_structure', {path: input.current?.value});
-        setResult(folderStructure as string)
+        setResult('```\n' + folderStructure as string + '\n```')
     }
 
     return <Stack>
@@ -18,7 +19,9 @@ export default function HomePage() {
             <Button onClick={handleClickRender}>Render</Button>
         </Group>
         <Paper shadow="xs" radius="lg" p="xl" withBorder>
-            <Text>{result}</Text>
+            <Markdown>
+                {result}
+            </Markdown>
         </Paper>
     </Stack>
 }

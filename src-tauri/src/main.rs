@@ -1,6 +1,8 @@
 use std::fs;
 use std::path::PathBuf;
 
+use tauri::command;
+
 struct Line {
     path: PathBuf,
     is_folder: bool,
@@ -10,8 +12,9 @@ struct Line {
 
 
 impl Line {
-    fn print_line(&self) {
+    fn build_line(&self) -> String {
         let mut line = String::new();
+        line.push_str("\n");
         for symbol in &self.list_symbol {
             line.push_str(symbol);
         }
@@ -19,12 +22,13 @@ impl Line {
         if self.is_folder {
             line.push_str("/");
         }
-        println!("{}", line);
+        line
     }
 }
 
-fn build_tree(line: Line) {
-    line.print_line();
+fn build_tree(line: Line, result: &mut String) -> &String {
+    result.push_str(line.build_line().as_str());
+    line.build_line();
     if let Ok(entries) = fs::read_dir(line.path) {
         let entries: Vec<_> = entries.filter_map(|e| e.ok()).collect();
         let last_index = entries.len() - 1;
@@ -49,19 +53,32 @@ fn build_tree(line: Line) {
                     is_folder,
                     is_last,
                     list_symbol: new_list_symbol,
-                });
+                }, result);
             }
         }
     }
+    result
 }
 
 
-
-fn main() {
-    build_tree(Line {
-        path: PathBuf::from(r"C:\Users\dinhtiendat1901\Desktop\New folder"),
+#[command]
+fn get_folder_structure(path: String) -> Result<String, String> {
+    let mut binding = String::new();
+    let result = build_tree(Line {
+        path: PathBuf::from(path),
         is_folder: true,
         is_last: false,
         list_symbol: Vec::new(),
-    })
+    }, &mut binding);
+
+    let new_result = result.clone();
+    Ok(new_result)
+}
+
+
+fn main() {
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![get_folder_structure])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
