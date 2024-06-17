@@ -1,7 +1,33 @@
-# Tauri + React + Typescript
+```
+RootDirectory/
+├── Folder1/
+│   ├── Subfolder1/
+│   │   ├── File1.txt
+│   │   └── File2.txt
+│   └── Subfolder2/
+│       ├── File1.txt
+│       │   ├── File1.txt
+│       │   └── File3.txt
+│       └── File3.txt
+└── Folder2/
+    ├── Subfolder3/
+    └── File4.txt
+```
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
 
-## Recommended IDE Setup
+```
+New folder/
+├── age/
+│   └── New Text Document.txt
+└── name/
+    └── meo/
+        ├── lenth.txt
+        └── xinto.txt
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+
+```
+
+
+
+
+
