@@ -1,80 +1,35 @@
-use std::fs;
-use std::path::PathBuf;
-
+use ignore::WalkBuilder;
+use std::path::{Path, PathBuf};
 use tauri::command;
-
-struct Line {
-    path: PathBuf,
-    is_folder: bool,
-    is_last: bool,
-    list_symbol: Vec<&'static str>,
-}
-
-
-impl Line {
-    fn build_line(&self) -> String {
-        let mut line = String::new();
-        line.push_str("\n");
-        for symbol in &self.list_symbol {
-            line.push_str(symbol);
-        }
-        line.push_str(self.path.file_name().unwrap().to_str().unwrap());
-        if self.is_folder {
-            line.push_str("/");
-        }
-        line
-    }
-}
-
-fn build_tree(line: Line, result: &mut String) -> &String {
-    result.push_str(line.build_line().as_str());
-    line.build_line();
-    if let Ok(entries) = fs::read_dir(line.path) {
-        let entries: Vec<_> = entries.filter_map(|e| e.ok()).collect();
-        let last_index = entries.len() - 1;
-
-
-        if line.is_folder {
-            for (i, entry) in entries.into_iter().enumerate() {
-                let path = entry.path();
-                let is_last = i == last_index;
-                let mut new_list_symbol = line.list_symbol.clone();
-                if let Some(last) = new_list_symbol.last_mut() {
-                    if line.is_last {
-                        *last = "    "
-                    } else {
-                        *last = "│   "
-                    }
-                }
-                let is_folder = if path.is_dir() { true } else { false };
-                new_list_symbol.push(if is_last { "└── " } else { "├── " });
-                build_tree(Line {
-                    path,
-                    is_folder,
-                    is_last,
-                    list_symbol: new_list_symbol,
-                }, result);
-            }
-        }
-    }
-    result
-}
-
 
 #[command]
 fn get_folder_structure(path: String) -> Result<String, String> {
-    let mut binding = String::new();
-    let result = build_tree(Line {
-        path: PathBuf::from(path),
-        is_folder: true,
-        is_last: false,
-        list_symbol: Vec::new(),
-    }, &mut binding);
+    let mut tree = String::new();
 
-    let new_result = result.clone();
-    Ok(new_result)
+    let base_path = Path::new(path.as_str());
+    let base_path_name = base_path.file_name().unwrap().to_string_lossy();
+
+    let walker = WalkBuilder::new(base_path).standard_filters(true).build();
+
+    for result in walker {
+        match result {
+            Ok(entry) => {
+                if let Ok(relative_path) = entry.path().strip_prefix(base_path) {
+                    let formatted_path: PathBuf = relative_path.iter().collect();
+                    let final_path = format!(
+                        "{}/{}",
+                        base_path_name,
+                        formatted_path.display().to_string().replace("\\", "/")
+                    );
+                    tree.push_str("\n");
+                    tree.push_str(final_path.as_str());
+                }
+            }
+            Err(err) => eprintln!("Error: {}", err),
+        }
+    }
+    Ok(tree)
 }
-
 
 fn main() {
     tauri::Builder::default()
