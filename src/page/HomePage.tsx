@@ -1,4 +1,4 @@
-import {Button, Group, Paper, Stack, TextInput} from "@mantine/core";
+import {Button, Group, Paper, Stack, Text, TextInput} from "@mantine/core";
 import {useRef, useState} from "react";
 import {invoke} from "@tauri-apps/api";
 import Markdown from "react-markdown";
@@ -19,6 +19,12 @@ export default function HomePage() {
             <Button onClick={handleClickRender}>Render</Button>
         </Group>
         <Paper shadow="xs" radius="lg" p="xl" withBorder>
+            <Text>
+                I will describe my project to you. Confirm with me that you clearly understand it.
+            </Text>
+            <Text>
+                Just answer yes or no. I don't need any more information.
+            </Text>
             <Markdown>
                 {result}
             </Markdown>
