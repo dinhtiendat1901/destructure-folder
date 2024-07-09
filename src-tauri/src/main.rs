@@ -5,13 +5,20 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 
 use ignore::WalkBuilder;
+use serde::Serialize;
 use tauri::command;
 
+#[derive(Serialize)]
+struct FileInfo {
+    path: String,
+    content: String,
+}
+
 #[command]
-fn get_folder_structure(path: String) -> Result<String, String> {
+fn get_folder_structure(path: String) -> Result<(String, String, Vec<FileInfo>), String> {
     let tree = build_file_path(path.clone())?;
-    let content = build_file_content(path)?;
-    Ok(tree + &content)
+    let (content, file_info_list) = build_file_content(path)?;
+    Ok((tree, content, file_info_list))
 }
 
 fn build_file_path(path: String) -> Result<String, String> {
@@ -42,8 +49,9 @@ fn build_file_path(path: String) -> Result<String, String> {
     Ok(tree)
 }
 
-fn build_file_content(path: String) -> Result<String, String> {
+fn build_file_content(path: String) -> Result<(String, Vec<FileInfo>), String> {
     let mut content = String::new();
+    let mut file_info_list = Vec::new();
 
     let base_path = Path::new(path.as_str());
     let base_path_name = base_path.file_name().unwrap().to_string_lossy();
@@ -69,8 +77,11 @@ fn build_file_content(path: String) -> Result<String, String> {
                                 if file.read_to_string(&mut file_content).is_ok() {
                                     content.push_str(file_content.as_str());
                                     content.push_str("\n\n\n");
-                                } else {
-                                }
+                                    file_info_list.push(FileInfo {
+                                        path: final_path.clone(),
+                                        content: file_content.clone(),
+                                    });
+                                } else {}
                             }
                             Err(_) => {}
                         }
@@ -80,7 +91,7 @@ fn build_file_content(path: String) -> Result<String, String> {
             Err(err) => eprintln!("Error: {}", err),
         }
     }
-    Ok(content)
+    Ok((content, file_info_list))
 }
 
 fn main() {
