@@ -1,4 +1,4 @@
-import {ActionIcon, Button, Code, CopyButton, Flex, Group, Paper, rem, Stack, Text, Tooltip} from "@mantine/core";
+import {ActionIcon, Button, Code, CopyButton, Group, Paper, rem, Stack, Text, Tooltip} from "@mantine/core";
 import {useState} from "react";
 import {invoke} from "@tauri-apps/api";
 import Markdown from "react-markdown";
@@ -51,13 +51,7 @@ export default function HomePage() {
                     gradient={{from: 'violet', to: 'pink', deg: 91}} size='lg'>Render</Button>
         </Group>
         <Paper shadow="xs" radius="lg" p="md" withBorder mt={30}>
-            <Flex justify="space-between">
-                <Stack>
-                    <Markdown>
-                        {tree}
-                    </Markdown>
-                    {listFileRender}
-                </Stack>
+            <Stack>
                 <CopyButton value={textCopy} timeout={7000}>
                     {({copied, copy}) => (
                         <Tooltip label={copied ? 'Copied' : 'Copy'} withArrow position="right">
@@ -71,7 +65,11 @@ export default function HomePage() {
                         </Tooltip>
                     )}
                 </CopyButton>
-            </Flex>
+                <Markdown>
+                    {tree}
+                </Markdown>
+                {listFileRender}
+            </Stack>
         </Paper>
     </Stack>
 }
