@@ -96,6 +96,8 @@ fn build_file_content(path: String) -> Result<(String, Vec<FileInfo>), String> {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![get_folder_structure])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

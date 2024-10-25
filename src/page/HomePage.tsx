@@ -1,9 +1,9 @@
 import {ActionIcon, Button, Code, CopyButton, Group, Paper, rem, Stack, Text, Tooltip} from "@mantine/core";
 import {useState} from "react";
-import {invoke} from "@tauri-apps/api";
+import {invoke} from "@tauri-apps/api/core";
 import Markdown from "react-markdown";
 import {IconCheck, IconCopy} from '@tabler/icons-react';
-import {open} from '@tauri-apps/api/dialog';
+import {open} from '@tauri-apps/plugin-dialog';
 
 interface FileInfo {
     path: string,
